@@ -176,7 +176,16 @@ class carddav_common
 		if (self::DEBUG){ $this->debug("$caller requesting $url as user $username [RL $redirect_limit]"); }
 
 		$httpful = \Httpful\Request::init();
-		$scheme = strtolower($carddav['authentication_scheme']);
+		// $scheme = strtolower($carddav['authentication_scheme']);
+
+		/*
+		 * Easy Redmine returns `Digest realm="Locked content"` in WWW-Authenticate header,
+		 * but it refuses to autheticate using thsi scheme.
+		 * 
+		 * Make sure to use HTTPS as the passwords are transported in plaintext!
+		 */
+		$scheme = "basic";
+
 		if ($scheme != "basic" && $scheme != "digest" && $scheme != "negotiate"){
 				/* figure out authentication */
 				$httpful->addHeader("User-Agent", "RCM CardDAV plugin/3.0.3");
