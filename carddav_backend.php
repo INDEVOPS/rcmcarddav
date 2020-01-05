@@ -859,14 +859,10 @@ EOF
 	{{{
     $records = 0;
 	$urls = array();
-	$xpresult = $xml->xpath('//RCMCD:response[starts-with(translate(child::RCMCD:propstat/RCMCD:status, "ABCDEFGHJIKLMNOPQRSTUVWXYZ", "abcdefghjiklmnopqrstuvwxyz"), "http/1.1 200 ") and child::RCMCD:propstat/RCMCD:prop/RCMCD:getetag]');
+	$xpresult = $xml->xpath('//d:response[d:propstat/d:status="HTTP/1.0 200 OK" and d:href]');
 	foreach ($xpresult as $r) {
-		self::$helper->registerNamespaces($r);
-
-		list($href) = $r->xpath('child::RCMCD:href');
-		if(preg_match('/\/$/', $href)) continue;
-
-		list($etag) = $r->xpath('descendant::RCMCD:getetag');
+		$href =  (string) $r->xpath('d:href')[0];
+		$etag = (string) $r->xpath('d:propstat/d:prop/d:getetag')[0];
 
 		$ret = self::checkcache($this->existing_card_cache,"$href","$etag");
 		$retgrp = self::checkcache($this->existing_grpcard_cache,"$href","$etag");
